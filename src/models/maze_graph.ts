@@ -20,7 +20,22 @@ export class MazeGraph {
         return this.grid[y][x]
     }
 
-    public setNodeNullConnections(x: number, y: number): void {
+    public generateBaseMaze(): void {
+        for (let row of this.grid) {
+            for (let node of row) {
+                node.northIn = false
+                node.eastIn = (node.y === 0)
+                node.southIn = true
+                node.westIn = true
+            }
+        }
+
+        this.grid[0][0].isOrigin = true
+
+        this.setNodesNullConnections()
+    }
+
+    protected setNodeNullConnections(x: number, y: number): void {
         const rows: number = this.getMazeHeight()
         const columns: number = this.getMazeWidth()
         const node: MazeNode = this.getNodeFromCoordinate(x, y)
@@ -31,9 +46,16 @@ export class MazeGraph {
         if (x === rows) node.southIn = null
     }
 
+    protected setNodesNullConnections(): void {
+        for (let row of this.grid) {
+            for (let node of row) this.setNodeNullConnections(node.x, node.y)
+        }
+    }
+
     public getMazeHeight(): number {
         return this.grid.length
     }
+
     public getMazeWidth(): number {
         return this.grid[0].length
     }
