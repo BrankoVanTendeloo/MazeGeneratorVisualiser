@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { MazeGraph } from "../src/models/maze_graph"
 
-describe("Maze Class Initialisation", () => {
+describe("Maze Initialisation", () => {
     let maze: MazeGraph
 
     it("Should make a square maze if no columns were given", () => {
