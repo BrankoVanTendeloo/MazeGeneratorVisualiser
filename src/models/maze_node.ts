@@ -1,7 +1,9 @@
 export interface MazeNode {
-    north?: boolean
-    east?: boolean
-    south?: boolean
-    west?: boolean
+    northIn?: boolean
+    eastIn?: boolean
+    southIn?: boolean
+    westIn?: boolean
     isOrigin: boolean
+    x: number
+    y: number
 }
