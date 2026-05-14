@@ -14,13 +14,15 @@ export class MazeGraph {
             }
             this.grid.push(row)
         }
+
+        this.generateBaseMaze()
     }
 
     public getNodeFromCoordinate(x: number, y: number): MazeNode {
         return this.grid[y][x]
     }
 
-    public generateBaseMaze(): void {
+    protected generateBaseMaze(): void {
         for (let row of this.grid) {
             for (let node of row) {
                 node.northIn = false
