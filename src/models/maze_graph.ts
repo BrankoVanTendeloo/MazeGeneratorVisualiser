@@ -1,6 +1,6 @@
 import { MazeNode } from "./maze_node";
 
-export class MazeGrid {
+export class MazeGraph {
     grid: MazeNode[][]
 
     constructor(rows: number, columns: number | null = null) {
@@ -18,6 +18,17 @@ export class MazeGrid {
 
     public getNodeFromCoordinate(x: number, y: number): MazeNode {
         return this.grid[y][x]
+    }
+
+    public setNodeNullConnections(x: number, y: number): void {
+        const rows: number = this.getMazeHeight()
+        const columns: number = this.getMazeWidth()
+        const node: MazeNode = this.getNodeFromCoordinate(x, y)
+
+        if (x === 0) node.westIn = null
+        if (y === 0) node.northIn = null
+        if (x === columns) node.eastIn = null
+        if (x === rows) node.southIn = null
     }
 
     public getMazeHeight(): number {
