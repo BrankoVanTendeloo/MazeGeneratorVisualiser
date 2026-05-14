@@ -1,5 +1,7 @@
 import { MazeNode } from "./maze_node";
 
+type Direction = 'north' | "east" | "south" | "west"
+
 export class MazeGraph {
     grid: MazeNode[][]
 
@@ -18,6 +20,50 @@ export class MazeGraph {
         this.generateBaseMaze()
     }
 
+    public validateMaze(): boolean {
+        let originsSeen: number = 0
+        for (let row of this.grid) {
+            for (let node of row) {
+                const outgoingConnections: Direction[] = this.getNodeOutgoingConnections(node.x, node.y)
+                if ((node.isOrigin && outgoingConnections.length !== 0) || (!node.isOrigin && outgoingConnections.length !== 1)) return false
+                if (node.isOrigin) originsSeen++
+            }
+        }
+        return (originsSeen === 1)
+    }
+
+    public getNodeIncomingConnections(x: number, y: number): Direction[] {
+        const connectionsFound: Direction[] = []
+        const node: MazeNode = this.getNodeFromCoordinate(x, y)
+        if (node.northIn) connectionsFound.push("north")
+        if (node.eastIn) connectionsFound.push("east")
+        if (node.southIn) connectionsFound.push("south")
+        if (node.westIn) connectionsFound.push("west")
+        return connectionsFound
+    }
+
+    public getNodeValidConnectionDirections(x: number, y: number): Direction[] {
+        const validConnections: Direction[] = []
+        const node: MazeNode = this.getNodeFromCoordinate(x, y)
+        if (node.northIn !== null) validConnections.push("north")
+        if (node.eastIn !== null) validConnections.push("east")
+        if (node.southIn !== null) validConnections.push("south")
+        if (node.westIn !== null) validConnections.push("west")
+        return validConnections
+    }
+
+    public getNodeOutgoingConnections(x: number, y: number): Direction[] {
+        const connectionsFound: Direction[] = []
+        const validConnections: Direction[] = this.getNodeValidConnectionDirections(x, y)
+
+        if (validConnections.includes("north") && this.getNodeFromCoordinate(x, y - 1).southIn) connectionsFound.push("north")
+        if (validConnections.includes("east") && this.getNodeFromCoordinate(x + 1, y).westIn) connectionsFound.push("east")
+        if (validConnections.includes("south") && this.getNodeFromCoordinate(x, y + 1).northIn) connectionsFound.push("south")
+        if (validConnections.includes("west") && this.getNodeFromCoordinate(x - 1, y).eastIn) connectionsFound.push("west")
+
+        return connectionsFound
+    }
+
     public getNodeFromCoordinate(x: number, y: number): MazeNode {
         return this.grid[y][x]
     }
@@ -28,7 +74,7 @@ export class MazeGraph {
                 node.northIn = false
                 node.eastIn = (node.y === 0)
                 node.southIn = true
-                node.westIn = true
+                node.westIn = false
             }
         }
 
@@ -44,8 +90,8 @@ export class MazeGraph {
 
         if (x === 0) node.westIn = null
         if (y === 0) node.northIn = null
-        if (x === columns) node.eastIn = null
-        if (x === rows) node.southIn = null
+        if (x === columns - 1) node.eastIn = null
+        if (y === rows - 1) node.southIn = null
     }
 
     protected setNodesNullConnections(): void {
