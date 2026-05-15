@@ -1,2 +1,2 @@
 # MazeGeneratorVisualiser
-A maze generator visualiser
+A self-made maze generator visualiser
