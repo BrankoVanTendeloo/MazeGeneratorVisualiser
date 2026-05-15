@@ -6,3 +6,7 @@ button.directional-input {
     width: 40px;
     height: 40px;
 }
+
+.text-justify {
+    text-align: justify;
+}
