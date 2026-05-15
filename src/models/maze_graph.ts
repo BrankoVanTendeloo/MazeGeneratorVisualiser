@@ -121,4 +121,37 @@ export class MazeGraph {
         }
         return undefined
     }
+
+    public getNodeInDirection(x: number, y: number, direction: Direction): { x: number, y: number } | undefined {
+        if (direction === "north") return { x: x, y: y - 1 }
+        else if (direction === "east") return { x: x + 1, y: y - 1 }
+        else if (direction === "south") return { x: x, y: y + 1 }
+        else if (direction === "west") return { x: x - 1, y: y }
+        else return undefined
+    }
+
+    public getAllConnections(): { from: { x: number, y: number }, to: { x: number, y: number } }[] {
+        const output: { from: { x: number, y: number }, to: { x: number, y: number } }[] = []
+        for (let row of this.grid) {
+            for (let node of row) {
+                if (node.northIn) {
+                    const connectedCoords = this.getNodeInDirection(node.x, node.y, "north")!
+                    output.push({ from: { x: node.x, y: node.y }, to: { x: connectedCoords.x, y: connectedCoords.y } })
+                }
+                if (node.eastIn) {
+                    const connectedCoords = this.getNodeInDirection(node.x, node.y, "east")!
+                    output.push({ from: { x: node.x, y: node.y }, to: { x: connectedCoords.x, y: connectedCoords.y } })
+                }
+                if (node.southIn) {
+                    const connectedCoords = this.getNodeInDirection(node.x, node.y, "south")!
+                    output.push({ from: { x: node.x, y: node.y }, to: { x: connectedCoords.x, y: connectedCoords.y } })
+                }
+                if (node.westIn) {
+                    const connectedCoords = this.getNodeInDirection(node.x, node.y, "west")!
+                    output.push({ from: { x: node.x, y: node.y }, to: { x: connectedCoords.x, y: connectedCoords.y } })
+                }
+            }
+        }
+        return output
+    }
 }
