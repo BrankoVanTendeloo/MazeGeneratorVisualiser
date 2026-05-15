@@ -29,6 +29,14 @@ let mazeDrawer: MazeDrawer = new MazeDrawer(maze, canvas, "both")
 
 let generating: boolean = false
 
+// automation
+function generationLoop(): void {
+    if (!generating) return
+
+    moveOrigin("random")
+
+    requestAnimationFrame(generationLoop)
+}
 
 // directional inputs event listeners
 directionalRandomButton.addEventListener("click", () => {
@@ -120,14 +128,14 @@ function setGenerating(on: boolean): void {
     setAllDirectionalInputsDisabled()
 
     if (on) {
-
-    } else {
-
+        generationLoop()
     }
 }
 
 function setAllDirectionalInputsDisabled(): void {
     for (let button of directionalInputs) setDirectionalInputDisabled(button)
+    if (maze.getMazeHeight() < 2 && maze.getMazeWidth() < 2) startButton.disabled = true
+    else startButton.disabled = false
 }
 
 function setDirectionalInputDisabled(button: HTMLButtonElement): void {
@@ -136,6 +144,7 @@ function setDirectionalInputDisabled(button: HTMLButtonElement): void {
     else if (button.isSameNode(directionalRightButton)) button.disabled = !maze.canMoveInDirection("east")
     else if (button.isSameNode(directionalDownButton)) button.disabled = !maze.canMoveInDirection("south")
     else if (button.isSameNode(directionalLeftButton)) button.disabled = !maze.canMoveInDirection("west")
+    else if (button.isSameNode(directionalRandomButton)) button.disabled = (maze.getMazeHeight() < 2 && maze.getMazeWidth() < 2)
     else button.disabled = false
 }
 
