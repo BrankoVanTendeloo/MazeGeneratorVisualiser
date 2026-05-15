@@ -107,4 +107,18 @@ export class MazeGraph {
     public getMazeWidth(): number {
         return this.grid[0].length
     }
+
+    public getOriginCoordinates(): { x: number, y: number } | undefined {
+        for (let row of this.grid) {
+            for (let node of row) {
+                if (node.isOrigin) {
+                    return {
+                        x: node.x,
+                        y: node.y
+                    }
+                }
+            }
+        }
+        return undefined
+    }
 }
