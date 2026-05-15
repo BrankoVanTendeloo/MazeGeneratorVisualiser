@@ -64,6 +64,20 @@ export class MazeGraph {
         return connectionsFound
     }
 
+    public getNodeAllConnections(x: number, y: number): Direction[] {
+        const nodeIncomingConnections: Direction[] = this.getNodeIncomingConnections(x, y)
+        const nodeOutgoingConnections: Direction[] = this.getNodeOutgoingConnections(x, y)
+        const allConnections: Direction[] = [...nodeIncomingConnections, ...nodeOutgoingConnections]
+
+        const output: Direction[] = []
+
+        for (let item of allConnections) {
+            if (!output.includes(item)) output.push(item)
+        }
+
+        return output
+    }
+
     public getNodeFromCoordinate(x: number, y: number): MazeNode {
         return this.grid[y][x]
     }

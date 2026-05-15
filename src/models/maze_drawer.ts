@@ -1,4 +1,7 @@
+import { end } from "@popperjs/core";
 import { MazeGraph } from "./maze_graph";
+
+type Direction = 'north' | "east" | "south" | "west"
 
 interface Coordinates { x: number, y: number }
 
@@ -39,12 +42,62 @@ export class MazeDrawer {
             this.drawAllConnections()
             this.drawAllNodes()
         }
-        if (render !== "graph") { }
+        if (render !== "graph") {
+            this.drawAllWalls()
+        }
     }
 
     public changeRenderType(render: renderType): void {
         this.renderStyle = render
         this.drawMazeFromSettings()
+    }
+
+    public drawWall(x: number, y: number, direction: Direction): void {
+        const startLine: Coordinates = this.nodeCoordinatesToPixelCoordinates(x, y)
+        const endLine: Coordinates = this.nodeCoordinatesToPixelCoordinates(x, y)
+        const offset = this.getSquareSize() / 2
+
+        if (direction === "north") {
+            startLine.x -= offset
+            startLine.y -= offset
+            endLine.x += offset
+            endLine.y -= offset
+        } else if (direction === "east") {
+            startLine.x += offset
+            startLine.y -= offset
+            endLine.x += offset
+            endLine.y += offset
+        } else if (direction === "south") {
+            startLine.x += offset
+            startLine.y += offset
+            endLine.x -= offset
+            endLine.y += offset
+        } else {
+            startLine.x -= offset
+            startLine.y += offset
+            endLine.x -= offset
+            endLine.y -= offset
+        }
+
+        this.ctx.beginPath()
+        this.ctx.moveTo(startLine.x, startLine.y)
+        this.ctx.lineTo(endLine.x, endLine.y)
+        this.ctx.lineCap = "butt"
+        this.ctx.lineWidth = 1
+        this.ctx.strokeStyle = "black"
+        this.ctx.stroke()
+    }
+
+    public drawAllWalls(): void {
+        for (let row of this.graph.grid) {
+            for (let node of row) {
+                const allConnections = this.graph.getNodeAllConnections(node.x, node.y)
+                if (!allConnections.includes("north")) this.drawWall(node.x, node.y, "north")
+                if (!allConnections.includes("east")) this.drawWall(node.x, node.y, "east")
+                if (!allConnections.includes("south")) this.drawWall(node.x, node.y, "south")
+                if (!allConnections.includes("west")) this.drawWall(node.x, node.y, "west")
+            }
+        }
     }
 
     public drawNode(x: number, y: number, isOrigin: boolean = false): void {
