@@ -13,19 +13,27 @@ export class MazeDrawer {
 
     canvasMargin: number
     ctx: CanvasRenderingContext2D
+    renderStyle: renderType
 
     constructor(graph: MazeGraph, canvas: HTMLCanvasElement, render: renderType) {
         this.graph = graph
         this.canvas = canvas
+        this.renderStyle = render
 
         this.canvasWidth = this.canvas.width
         this.canvasHeight = this.canvas.height
 
         this.canvasMargin = 10
 
-        this.ctx = canvas.getContext("2d")!
 
-        if (render !== "walls") this.drawAllNodes()
+        this.ctx = this.canvas.getContext("2d")!
+
+        this.drawMazeFromSettings()
+    }
+
+    public drawMazeFromSettings(render: renderType = this.renderStyle): void {
+        if (render !== "walls") { this.drawAllNodes() }
+        if (render !== "graph") { }
     }
 
     public drawNode(x: number, y: number): void {
@@ -39,6 +47,11 @@ export class MazeDrawer {
 
     public drawAllNodes(): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
+        const originNodes = this.graph.getOriginCoordinates()!
+        const originCoords = this.nodeCoordinatesToPixelCoordinates(originNodes.x, originNodes.y)
+        this.drawOrigin(originCoords.x, originCoords.y)
+
         for (let row of this.graph.grid) {
             for (let node of row) {
                 this.drawNode(node.x, node.y)
@@ -59,5 +72,12 @@ export class MazeDrawer {
             x: (x + 0.5) * squareSize + xAddition,
             y: (y + 0.5) * squareSize + yAddition
         }
+    }
+
+    public drawOrigin(x: number, y: number): void {
+        this.ctx.beginPath()
+        this.ctx.arc(x, y, 5, 0, 2 * Math.PI)
+        this.ctx.fillStyle = "red"
+        this.ctx.fill()
     }
 }

@@ -55,6 +55,8 @@ widthRange.addEventListener("input", () => {
     startButton.disabled = false
 })
 
+
+// Reset maze
 function resetMaze(): void {
     maze = new MazeGraph(+heightRange.value, +widthRange.value)
     mazeDrawer = new MazeDrawer(maze, canvas, "both")
