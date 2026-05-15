@@ -168,4 +168,13 @@ export class MazeGraph {
         }
         return output
     }
+
+    public getValidMoveDirections(): Direction[] {
+        const origin = this.getOriginCoordinates()!
+        return this.getNodeAllConnections(origin.x, origin.y)
+    }
+
+    public canMoveInDirection(direction: Direction): boolean {
+        return this.getValidMoveDirections().includes(direction)
+    }
 }

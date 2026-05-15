@@ -34,8 +34,26 @@
                 </div>
             </div>
         </div>
-        <div class="container text-center row mt-3">
-            <button class="btn btn-primary" id="start-button">Start</button>
+        <div class="row mt-3">
+            <div class="d-flex flex-column align-items-center gap-2">
+                <button class="btn btn-primary directional-input" title="Move origin up" id="directional-up">↑</button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary directional-input" title="Move origin left"
+                        id="directional-left">←</button>
+
+                    <button class="btn btn-primary directional-input" title="Randomly move origin"
+                        id="directional-random">○</button>
+
+                    <button class="btn btn-primary directional-input" title="Move origin right"
+                        id="directional-right">→</button>
+                </div>
+                <button class="btn btn-primary directional-input" title="Move origin down"
+                    id="directional-down">↓</button>
+            </div>
+        </div>
+        <div class="row container text-center mt-3">
+            <button class="btn btn-primary" id="start-button" title="Toggle between random generation">Start random
+                generation</button>
         </div>
     </div>
     <div class="container text-center mt-3 mb-3">

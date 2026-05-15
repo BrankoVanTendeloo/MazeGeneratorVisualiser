@@ -1,4 +1,3 @@
-import { end } from "@popperjs/core";
 import { MazeGraph } from "./maze_graph";
 
 type Direction = 'north' | "east" | "south" | "west"
