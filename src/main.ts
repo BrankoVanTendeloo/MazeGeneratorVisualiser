@@ -5,6 +5,7 @@ import { MazeDrawer } from './models/maze_drawer';
 import { MazeGraph } from './models/maze_graph';
 
 type renderType = "walls" | "graph" | "both"
+type Direction = 'north' | "east" | "south" | "west"
 
 const homePage = new HomePage()
 homePage.render()
@@ -28,9 +29,27 @@ let mazeDrawer: MazeDrawer = new MazeDrawer(maze, canvas, "both")
 
 let generating: boolean = false
 
+
+// directional inputs event listeners
+directionalRandomButton.addEventListener("click", () => {
+    moveOrigin("random")
+})
+directionalUpButton.addEventListener("click", () => {
+    moveOrigin("north")
+})
+directionalRightButton.addEventListener("click", () => {
+    moveOrigin("east")
+})
+directionalDownButton.addEventListener("click", () => {
+    moveOrigin("south")
+})
+directionalLeftButton.addEventListener("click", () => {
+    moveOrigin("west")
+})
+
 // radio buttons function
 for (let radio of radios) {
-    radio.addEventListener("change", (e) => {
+    radio.addEventListener("change", () => {
         if (radio.checked) {
             if (radio.value === "walls") mazeDrawer.changeRenderType("walls")
             else if (radio.value === "graph") mazeDrawer.changeRenderType("graph")
@@ -118,4 +137,14 @@ function setDirectionalInputDisabled(button: HTMLButtonElement): void {
     else if (button.isSameNode(directionalDownButton)) button.disabled = !maze.canMoveInDirection("south")
     else if (button.isSameNode(directionalLeftButton)) button.disabled = !maze.canMoveInDirection("west")
     else button.disabled = false
+}
+
+function moveOrigin(direction: Direction | "random"): void {
+    if (direction === "random") {
+        const possible: Direction[] = maze.getValidMoveDirections()
+        direction = possible[Math.floor(Math.random() * possible.length)]
+    }
+    maze.moveOrigin(direction)
+    mazeDrawer.drawMazeFromSettings()
+    setAllDirectionalInputsDisabled()
 }
