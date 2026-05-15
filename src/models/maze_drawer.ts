@@ -32,7 +32,13 @@ export class MazeDrawer {
     }
 
     public drawMazeFromSettings(render: renderType = this.renderStyle): void {
-        if (render !== "walls") { this.drawAllNodes() }
+        this.ctx.fillStyle = "white"
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+        if (render !== "walls") {
+            this.drawAllConnections()
+            this.drawAllNodes()
+        }
         if (render !== "graph") { }
     }
 
@@ -41,28 +47,93 @@ export class MazeDrawer {
         this.drawMazeFromSettings()
     }
 
-    public drawNode(x: number, y: number): void {
+    public drawNode(x: number, y: number, isOrigin: boolean = false): void {
         const coords = this.nodeCoordinatesToPixelCoordinates(x, y)
 
         this.ctx.beginPath()
         this.ctx.arc(coords.x, coords.y, 5, 0, 2 * Math.PI)
+        this.ctx.lineWidth = 1
         this.ctx.strokeStyle = "black"
         this.ctx.stroke()
+        if (!isOrigin) {
+            this.ctx.fillStyle = "white"
+            this.ctx.fill()
+        }
     }
 
     public drawAllNodes(): void {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
         const originNodes = this.graph.getOriginCoordinates()!
         const originCoords = this.nodeCoordinatesToPixelCoordinates(originNodes.x, originNodes.y)
         this.drawOrigin(originCoords.x, originCoords.y)
 
         for (let row of this.graph.grid) {
             for (let node of row) {
-                this.drawNode(node.x, node.y)
+                this.drawNode(node.x, node.y, node.isOrigin)
             }
         }
     }
+
+    public drawConnection(connection: { from: Coordinates, to: Coordinates }): void {
+        const fromCoords = this.nodeCoordinatesToPixelCoordinates(connection.from.x, connection.from.y)
+        const toCoords = this.nodeCoordinatesToPixelCoordinates(connection.to.x, connection.to.y)
+        const middleCoords = this.getMiddleOfLine(fromCoords, toCoords)
+
+        this.ctx.beginPath()
+        this.ctx.moveTo(fromCoords.x, fromCoords.y)
+        this.ctx.lineTo(toCoords.x, toCoords.y)
+        this.ctx.lineWidth = 2
+        this.ctx.strokeStyle = "green"
+        this.ctx.stroke()
+
+        // draw the arrow
+        let arrowEnd1: Coordinates = { x: middleCoords.x, y: middleCoords.y }
+        let arrowEnd2: Coordinates = { x: middleCoords.x, y: middleCoords.y }
+        const arrowSize = 5
+        if (connection.from.x === connection.to.x) {
+            arrowEnd1.x += arrowSize
+            arrowEnd2.x -= arrowSize
+            if (connection.from.y < connection.to.y) {
+                arrowEnd1.y += arrowSize
+                arrowEnd2.y += arrowSize
+            } else {
+                arrowEnd1.y -= arrowSize
+                arrowEnd2.y -= arrowSize
+            }
+        } else {
+            arrowEnd1.y += arrowSize
+            arrowEnd2.y -= arrowSize
+            if (connection.from.x < connection.to.x) {
+                arrowEnd1.x += arrowSize
+                arrowEnd2.x += arrowSize
+            } else {
+                arrowEnd1.x -= arrowSize
+                arrowEnd2.x -= arrowSize
+            }
+        }
+
+        this.ctx.lineCap = "round"
+        this.ctx.lineWidth = 2
+        this.ctx.strokeStyle = "green"
+
+        this.ctx.beginPath()
+        this.ctx.moveTo(middleCoords.x, middleCoords.y)
+        this.ctx.lineTo(arrowEnd1.x, arrowEnd1.y)
+        this.ctx.stroke()
+
+        this.ctx.beginPath()
+        this.ctx.moveTo(middleCoords.x, middleCoords.y)
+        this.ctx.lineTo(arrowEnd2.x, arrowEnd2.y)
+        this.ctx.stroke()
+    }
+
+    public drawAllConnections(): void {
+        for (let connection of this.graph.getAllConnections()) this.drawConnection(connection)
+    }
+
+    protected getMiddleOfLine(from: Coordinates, to: Coordinates): Coordinates {
+        return { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }
+    }
+
 
     protected getSquareSize(): number {
         return Math.min((this.canvasWidth - (this.canvasMargin * 2)) / this.graph.getMazeWidth(), (this.canvasHeight - (this.canvasMargin * 2)) / this.graph.getMazeHeight())

@@ -124,7 +124,7 @@ export class MazeGraph {
 
     public getNodeInDirection(x: number, y: number, direction: Direction): { x: number, y: number } | undefined {
         if (direction === "north") return { x: x, y: y - 1 }
-        else if (direction === "east") return { x: x + 1, y: y - 1 }
+        else if (direction === "east") return { x: x + 1, y: y }
         else if (direction === "south") return { x: x, y: y + 1 }
         else if (direction === "west") return { x: x - 1, y: y }
         else return undefined
