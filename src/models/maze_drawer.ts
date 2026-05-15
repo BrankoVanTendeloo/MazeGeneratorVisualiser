@@ -36,6 +36,11 @@ export class MazeDrawer {
         if (render !== "graph") { }
     }
 
+    public changeRenderType(render: renderType): void {
+        this.renderStyle = render
+        this.drawMazeFromSettings()
+    }
+
     public drawNode(x: number, y: number): void {
         const coords = this.nodeCoordinatesToPixelCoordinates(x, y)
 
