@@ -170,32 +170,31 @@ export class MazeGraph {
     }
 
     public getValidMoveDirections(): Direction[] {
-        const origin = this.getOriginCoordinates()!
-        return this.getNodeAllConnections(origin.x, origin.y)
+        const originCoords = this.getOriginCoordinates()!
+        const origin = this.getNodeFromCoordinate(originCoords.x, originCoords.y)
+        const output: Direction[] = []
+
+        if (origin.northIn !== null) output.push("north")
+        if (origin.eastIn !== null) output.push("east")
+        if (origin.southIn !== null) output.push("south")
+        if (origin.westIn !== null) output.push("west")
+        return output
     }
 
     public canMoveInDirection(direction: Direction): boolean {
         return this.getValidMoveDirections().includes(direction)
     }
 
-    private getAdjacentNodes(x: number, y: number): MazeNode[] {
-        const output: MazeNode[] = []
-        const validDirections = this.getNodeValidConnectionDirections(x, y)
-
-        for (let direction of validDirections) {
-            const neighbourCoordinates = this.getNodeInDirection(x, y, direction)!
-            output.push(this.getNodeFromCoordinate(neighbourCoordinates.x, neighbourCoordinates.y))
+    private shatterAllOutgoingConnections(x: number, y: number): void {
+        const directions = this.getNodeOutgoingConnections(x, y)
+        for (let direction of directions) {
+            const neighbourCoords = this.getNodeInDirection(x, y, direction)!
+            const neighbour = this.getNodeFromCoordinate(neighbourCoords.x, neighbourCoords.y)
+            if (direction === "north") neighbour.southIn = false
+            else if (direction === "east") neighbour.westIn = false
+            else if (direction === "south") neighbour.northIn = false
+            else neighbour.eastIn = false
         }
-
-        return output
-    }
-
-    private shatterConnection(x: number, y: number, direction: Direction): void {
-        const neighbour = this.getNodeInDirection(x, y, direction)!
-        if (direction === "north") this.getNodeFromCoordinate(neighbour.x, neighbour.y).southIn = false
-        else if (direction === "east") this.getNodeFromCoordinate(neighbour.x, neighbour.y).westIn = false
-        else if (direction === "south") this.getNodeFromCoordinate(neighbour.x, neighbour.y).northIn = false
-        else this.getNodeFromCoordinate(neighbour.x, neighbour.y).eastIn = false
     }
 
     // Algorithm
@@ -206,26 +205,30 @@ export class MazeGraph {
         const newOriginCoords = this.getNodeInDirection(oldOrigin.x, oldOrigin.y, direction)!
         const newOrigin = this.getNodeFromCoordinate(newOriginCoords.x, newOriginCoords.y)
 
+        // Point old origin in new direction
+        if (direction === "north") {
+            newOrigin.southIn = true
+            oldOrigin.northIn = false
+        }
+        else if (direction === "east") {
+            newOrigin.westIn = true
+            oldOrigin.eastIn = false
+        }
+        else if (direction === "south") {
+            newOrigin.northIn = true
+            oldOrigin.southIn = false
+        }
+        else {
+            newOrigin.eastIn = true
+            oldOrigin.westIn = false
+        }
+
         // move origin
         oldOrigin.isOrigin = false
         newOrigin.isOrigin = true
 
-        // remove adjacent nodes' outgoing connections
-        const originNeighbouringNodes = this.getAdjacentNodes(newOrigin.x, newOrigin.y)
-
-        for (let originNeighbouringNode of originNeighbouringNodes) {
-            for (let neighbourOutgoingDirection of this.getNodeOutgoingConnections(originNeighbouringNode.x, originNeighbouringNode.y)) {
-                this.shatterConnection(originNeighbouringNode.x, originNeighbouringNode.y, neighbourOutgoingDirection)
-            }
-        }
-        for (let outgoingDirection of this.getNodeOutgoingConnections(newOrigin.x, newOrigin.y)) {
-            this.shatterConnection(newOrigin.x, newOrigin.y, outgoingDirection)
-        }
-
-        // point all adjacent nodes to new origin
-        if (newOrigin.northIn === false) newOrigin.northIn = true
-        if (newOrigin.eastIn === false) newOrigin.eastIn = true
-        if (newOrigin.southIn === false) newOrigin.southIn = true
-        if (newOrigin.westIn === false) newOrigin.westIn = true
+        // remove new origin's outbound edge
+        this.shatterAllOutgoingConnections(newOrigin.x, newOrigin.y)
     }
 }
+

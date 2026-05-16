@@ -137,4 +137,11 @@ describe("Maze Initialisation", () => {
         maze = new MazeGraph(1)
         expect(maze.validateMaze()).toBe(true)
     })
+
+    it("Each node has 0 or 1 outgoing connections", () => {
+        maze = new MazeGraph(15, 15)
+        for (let i: number = 0; i < maze.getMazeHeight(); i++) {
+            for (let j: number = 0; j < maze.getMazeWidth(); j++) expect(maze.getNodeOutgoingConnections(j, i).length).toBeLessThan(2)
+        }
+    })
 })
