@@ -18,11 +18,11 @@ const widthSpan = document.querySelector<HTMLSpanElement>("#width-current-value"
 const canvas = document.querySelector<HTMLCanvasElement>("#maze-canvas")!
 const radios = document.querySelectorAll<HTMLInputElement>("input[name='maze-display']")
 const directionalInputs = document.querySelectorAll<HTMLButtonElement>(".directional-input")
-const directionalUpButton = document.querySelector<HTMLCanvasElement>("#directional-up")!
-const directionalLeftButton = document.querySelector<HTMLCanvasElement>("#directional-left")!
-const directionalRightButton = document.querySelector<HTMLCanvasElement>("#directional-right")!
-const directionalDownButton = document.querySelector<HTMLCanvasElement>("#directional-down")!
-const directionalRandomButton = document.querySelector<HTMLCanvasElement>("#directional-random")!
+const directionalUpButton = document.querySelector<HTMLButtonElement>("#directional-up")!
+const directionalLeftButton = document.querySelector<HTMLButtonElement>("#directional-left")!
+const directionalRightButton = document.querySelector<HTMLButtonElement>("#directional-right")!
+const directionalDownButton = document.querySelector<HTMLButtonElement>("#directional-down")!
+const directionalRandomButton = document.querySelector<HTMLButtonElement>("#directional-random")!
 
 let maze: MazeGraph = new MazeGraph(+heightRange.value, +widthRange.value)
 let mazeDrawer: MazeDrawer = new MazeDrawer(maze, canvas, "both")
@@ -157,3 +157,30 @@ function moveOrigin(direction: Direction | "random"): void {
     mazeDrawer.drawMazeFromSettings()
     setAllDirectionalInputsDisabled()
 }
+
+// key press event listeners
+window.addEventListener("keydown", (event) => {
+    if (generating) return
+    switch (event.key) {
+        case "ArrowUp":
+            event.preventDefault()
+            if (!directionalUpButton.disabled) moveOrigin("north")
+            break
+        case "ArrowRight":
+            event.preventDefault()
+            if (!directionalRightButton.disabled) moveOrigin("east")
+            break
+        case "ArrowDown":
+            event.preventDefault()
+            if (!directionalDownButton.disabled) moveOrigin("south")
+            break
+        case "ArrowLeft":
+            event.preventDefault()
+            if (!directionalLeftButton.disabled) moveOrigin("west")
+            break
+        case " ":
+            event.preventDefault()
+            if (!directionalRandomButton.disabled) moveOrigin("random")
+            break
+    }
+})
